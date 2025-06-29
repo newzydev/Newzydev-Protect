@@ -41,6 +41,6 @@ You may copy and use this script **with attribution**.
 ## ✨ Credit
 
 Developed by: [Sakdar Sukkwan](https://github.com/newzydev)  
-Email: `sakdar.s@example.com` *(replace with your real email)*
+Email: sakdar.newzydev@gmail.com
 
-If you use this in your project, don’t forget to ⭐ star the repo and give credit naค้าบ 🩷
+If you use this in your project, don’t forget to ⭐ star the repo and give credit nakub 🩷
