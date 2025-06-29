@@ -132,8 +132,8 @@ document.addEventListener('input', function (e) {
 // ==============================
 // แสดงข้อความใน Developer Console เพื่อเตือนคนแอบส่อง
 console.log('%cหยุด!!!', 'color: red; font-size: 40px; font-weight: bold;');
-console.log('%cประกาศจากผู้พัฒนาระบบ PSU Sports & Health Center', 'color: white; font-size: 16px;');
-console.log('%cฟีเจอร์นี้เป็นฟีเจอร์ของเบราว์เซอร์ที่มีจุดมุ่งหมายให้ใช้สำหรับผู้พัฒนา หากมีคนบอกให้คุณคัดลอกแล้ววางข้อความบางอย่างที่นี่เพื่อเปิดใช้งานฟีเจอร์ของ PSU Sports & Health Center หรือเพื่อเข้าถึงบัญชีของบุคคลใดบุคคลหนึ่ง โดยเจตนา คำบอกกล่าวเช่นนี้เป็นการหลอกลวงและจะมอบสิทธิการเข้าถึงบัญชี PSU Sports & Health Center ของคุณให้กับบุคคลดังกล่าว', 'color: white; font-size: 16px;');
+console.log('%cประกาศจากผู้พัฒนาระบบ [ระบบ]', 'color: white; font-size: 16px;');
+console.log('%cฟีเจอร์นี้เป็นฟีเจอร์ของเบราว์เซอร์ที่มีจุดมุ่งหมายให้ใช้สำหรับผู้พัฒนา หากมีคนบอกให้คุณคัดลอกแล้ววางข้อความบางอย่างที่นี่เพื่อเปิดใช้งานฟีเจอร์ของ [ระบบ] หรือเพื่อเข้าถึงบัญชีของบุคคลใดบุคคลหนึ่ง โดยเจตนา คำบอกกล่าวเช่นนี้เป็นการหลอกลวงและจะมอบสิทธิการเข้าถึงบัญชี PSU Sports & Health Center ของคุณให้กับบุคคลดังกล่าว', 'color: white; font-size: 16px;');
 console.log('%cโปรดอ่านนโยบายความเป็นส่วนตัว นโยบายคุกกี้ ข้อกำหนด และเงื่อนไขการใช้งาน %chttps://sportcenter-app.psu.ac.th/%c สำหรับข้อมูลเพิ่มเติม',
     'color: white; font-size: 16px;',
     'color: #00f; text-decoration: underline; font-size: 16px;',
