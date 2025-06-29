@@ -19,7 +19,7 @@ Developed with love by **Sakdar Sukkwan** 💻
 Copy the `Newzydev-Protect.js` file into your project and include it in your HTML or Razor page:
 
 ```html
-<script src="/js/Newzydev-Protect.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/newzydev/Newzydev-Protect@main/Newzydev-Protect.js"></script>
 ```
 
 ---
