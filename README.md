@@ -15,6 +15,9 @@ Developed with love by **Sakdar Sukkwan** 💻
   - `F12` – ห้ามเปิด DevTools
   - `Ctrl + S` – ห้ามบันทึกหน้าเว็บ
   - `F5` – ห้าม refresh
+- ✋ ป้องกันการเลือกข้อความ (Text Selection):
+  - กันไม่ให้ลากเมาส์เลือกข้อความ
+  - ปิด user-select ด้วย CSS
 - 🛡️ ป้องกัน SQL Injection เบื้องต้น:
   - กรองตัวอักษรพิเศษ `'`, `"`, `\\`, `;` ใน `<input>` และ `<textarea>`
 - 🔒 ป้องกันการแอบใช้ console ด้วยการแสดงคำเตือน Developer Console
