@@ -177,6 +177,32 @@ document.addEventListener('input', function (e) {
 });
 
 // ==============================
+// ป้องกัน Ctrl+C และ Ctrl+V ใน input และ textarea
+document.addEventListener('keydown', function (e) {
+    var message6 = "ระบบไม่อนุญาตให้คัดลอกข้อมูลค่ะ :)";
+    var message7 = "ระบบไม่อนุญาตให้วางข้อมูลค่ะ :)";
+    const tagName = e.target.tagName.toLowerCase();
+    const inputType = e.target.getAttribute("type") || "text";
+
+    // ตรวจเฉพาะช่องกรอกข้อมูล
+    if ((tagName === 'input' || tagName === 'textarea') && !e.target.disabled && !e.target.readOnly) {
+        // ห้าม Ctrl+C (Copy)
+        if (e.ctrlKey && e.key.toLowerCase() === 'c') {
+            alert(message6);
+            console.warn(message6);
+            e.preventDefault();
+        }
+
+        // ห้าม Ctrl+V (Paste)
+        if (e.ctrlKey && e.key.toLowerCase() === 'v') {
+            alert(message7);
+            console.warn(message7);
+            e.preventDefault();
+        }
+    }
+});
+
+// ==============================
 // แสดงข้อความใน Developer Console เพื่อเตือนคนแอบส่อง
 console.log('%cหยุด!!!', 'color: red; font-size: 40px; font-weight: bold;');
 console.log('%cประกาศจากผู้พัฒนาระบบ', 'color: white; font-size: 16px;');
