@@ -13,6 +13,43 @@
 // ใบอนุญาต : ได้รับอนุญาตภายใต้สัญญาอนุญาต Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)
 
 // ==============================
+// ป้องกันการเลือกข้อความ (Text Selection)
+document.addEventListener('selectstart', function (e) {
+    e.preventDefault();
+}, false);
+
+// ป้องกันการลากเพื่อเลือกข้อความ (Mouse Drag)
+document.addEventListener('mousedown', function (e) {
+    if (e.detail > 1) {
+        e.preventDefault();
+    }
+}, false);
+
+// ป้องกันการใช้คีย์บอร์ดในการเลือก (Shift + ลูกศร)
+document.addEventListener('keydown', function (e) {
+    if (e.shiftKey && (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        e.preventDefault();
+    }
+}, false);
+
+// CSS แบบเสริมเผื่อกันไว้ให้แน่น ๆ
+document.addEventListener("DOMContentLoaded", function () {
+    const css = `
+        * {
+            -webkit-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-user-drag: none !important;
+            -moz-user-drag: none !important;
+        }
+    `;
+    const style = document.createElement("style");
+    style.type = "text/css";
+    style.appendChild(document.createTextNode(css));
+    document.head.appendChild(style);
+});
+
+// ==============================
 // แสดงข้อความเตือนเมื่อพยายามเซฟรูป
 var clickmessage = "ระบบไม่อนุญาตให้บันทึกภาพค่ะ :)";
 
@@ -135,7 +172,7 @@ document.addEventListener('input', function (e) {
 // แสดงข้อความใน Developer Console เพื่อเตือนคนแอบส่อง
 console.log('%cหยุด!!!', 'color: red; font-size: 40px; font-weight: bold;');
 console.log('%cประกาศจากผู้พัฒนาระบบ', 'color: white; font-size: 16px;');
-console.log('%cฟีเจอร์นี้เป็นฟีเจอร์ของเบราว์เซอร์ที่มีจุดมุ่งหมายให้ใช้สำหรับผู้พัฒนา หากมีคนบอกให้คุณคัดลอกแล้ววางข้อความบางอย่างที่นี่เพื่อเปิดใช้งานฟีเจอร์ของระบบ หรือเพื่อเข้าถึงบัญชีของบุคคลใดบุคคลหนึ่ง โดยเจตนา คำบอกกล่าวเช่นนี้เป็นการหลอกลวงและจะมอบสิทธิการเข้าถึงบัญชี ของคุณให้กับบุคคลดังกล่าว', 'color: white; font-size: 16px;');
+console.log('%cฟีเจอร์นี้เป็นฟีเจอร์ของเบราว์เซอร์ที่มีจุดมุ่งหมายให้ใช้สำหรับผู้พัฒนา หากมีคนบอกให้คุณคัดลอกแล้ววางข้อความบางอย่างที่นี่เพื่อเปิดใช้งานฟีเจอร์ของระบบ หรือเพื่อเข้าถึงบัญชีของบุคคลใดบุคคลหนึ่ง โดยเจตนา คำบอกกล่าวเช่นนี้เป็นการหลอกลวงและอาจจะมอบสิทธิการเข้าถึงบัญชี ของคุณให้กับบุคคลดังกล่าว', 'color: white; font-size: 16px;');
 console.log('%cโปรดอ่านนโยบายความเป็นส่วนตัว นโยบายคุกกี้ ข้อกำหนด และเงื่อนไขการใช้งาน Newzydev-Protect ได้ที่ %chttps://github.com/newzydev/Newzydev-Protect%c สำหรับข้อมูลเพิ่มเติม',
     'color: white; font-size: 16px;',
     'color: #00f; text-decoration: underline; font-size: 16px;',
