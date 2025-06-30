@@ -42,6 +42,14 @@ document.addEventListener("DOMContentLoaded", function () {
             -webkit-user-drag: none !important;
             -moz-user-drag: none !important;
         }
+        img {
+            -webkit-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-user-drag: none !important;
+            -moz-user-drag: none !important;
+            pointer-events: none !important;
+        }
     `;
     const style = document.createElement("style");
     style.type = "text/css";
