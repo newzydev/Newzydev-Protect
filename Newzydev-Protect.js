@@ -2,12 +2,14 @@
 // English Version
 // Copyright © Sakdar Sukkwan. All rights reserved.
 // Developer : Sakdar Sukkwan
+// Source Code : https://github.com/newzydev/Newzydev-Protect
 // License : Licensed under Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0).
 
 // ==============================
 // Thai Version
 // ลิขสิทธิ์ © ศักดา สุขขวัญ. สงวนสิทธิ์ทุกประการ.
 // ผู้พัฒนา : ศักดา สุขขวัญ
+// แหล่งที่มา : https://github.com/newzydev/Newzydev-Protect
 // ใบอนุญาต : ได้รับอนุญาตภายใต้สัญญาอนุญาต Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)
 
 // ==============================
