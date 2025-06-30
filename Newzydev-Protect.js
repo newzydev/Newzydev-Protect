@@ -203,6 +203,38 @@ document.addEventListener('keydown', function (e) {
 });
 
 // ==============================
+// ป้องกันการสลับแท็บ / โปรแกรมอื่น (Overlay ดำทั้งจอ)
+document.addEventListener("visibilitychange", function () {
+    const existingOverlay = document.getElementById("blackout-overlay");
+
+    if (document.hidden) {
+        if (!existingOverlay) {
+            const overlay = document.createElement("div");
+            overlay.id = "blackout-overlay";
+            overlay.style.position = "fixed";
+            overlay.style.top = "0";
+            overlay.style.left = "0";
+            overlay.style.width = "100vw";
+            overlay.style.height = "100vh";
+            overlay.style.backgroundColor = "black";
+            overlay.style.color = "white";
+            overlay.style.display = "flex";
+            overlay.style.alignItems = "center";
+            overlay.style.justifyContent = "center";
+            overlay.style.fontSize = "1.5rem";
+            overlay.style.zIndex = "999999";
+            overlay.style.pointerEvents = "none";
+            overlay.innerText = "กรุณาอย่าออกจากหน้านี้ เพื่อความปลอดภัยของข้อมูลค่ะ";
+            document.body.appendChild(overlay);
+        }
+    } else {
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+    }
+});
+
+// ==============================
 // แสดงข้อความใน Developer Console เพื่อเตือนคนแอบส่อง
 console.log('%cหยุด!!!', 'color: red; font-size: 40px; font-weight: bold;');
 console.log('%cประกาศจากผู้พัฒนาระบบ', 'color: white; font-size: 16px;');
