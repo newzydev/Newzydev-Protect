@@ -4,6 +4,7 @@
 // Developer : Sakdar Sukkwan
 // Source Code : https://github.com/newzydev/Newzydev-Protect
 // License : Licensed under Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0).
+// Permission to modify the source code is granted by Sakdar Sukkwan
 
 // ==============================
 // Thai Version
@@ -11,12 +12,13 @@
 // ผู้พัฒนา : ศักดา สุขขวัญ
 // แหล่งที่มา : https://github.com/newzydev/Newzydev-Protect
 // ใบอนุญาต : ได้รับอนุญาตภายใต้สัญญาอนุญาต Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)
+// การแก้ไขซอร์สโค้ดได้รับอนุญาตโดย ศักดา สุขขวัญ
 
 // ==============================
 // ป้องกันการเลือกข้อความ (Text Selection)
-document.addEventListener('selectstart', function (e) {
-    e.preventDefault();
-}, false);
+//document.addEventListener('selectstart', function (e) {
+//    e.preventDefault();
+//}, false);
 
 // ป้องกันการลากเพื่อเลือกข้อความ (Mouse Drag)
 document.addEventListener('mousedown', function (e) {
@@ -32,30 +34,95 @@ document.addEventListener('keydown', function (e) {
     }
 }, false);
 
-// CSS แบบเสริมเผื่อกันไว้ให้แน่น ๆ
-document.addEventListener("DOMContentLoaded", function () {
-    const css = `
-        * {
-            -webkit-user-select: none !important;
-            -ms-user-select: none !important;
-            user-select: none !important;
-            -webkit-user-drag: none !important;
-            -moz-user-drag: none !important;
-        }
-        img {
-            -webkit-user-select: none !important;
-            -ms-user-select: none !important;
-            user-select: none !important;
-            -webkit-user-drag: none !important;
-            -moz-user-drag: none !important;
-            pointer-events: none !important;
-        }
-    `;
-    const style = document.createElement("style");
-    style.type = "text/css";
-    style.appendChild(document.createTextNode(css));
-    document.head.appendChild(style);
+// ==============================
+// ป้องกันเนื้อหาบนเว็บแบบปรับตามอุปกรณ์และโหมดการใช้งาน
+// เก็บแท็ก <style> ที่ถูกเพิ่มเข้าไปใน document ไว้เพื่อจะได้ลบตอนเปลี่ยนขนาดหน้าจอ
+let dynamicStyleTag;
+
+// ฟังก์ชันสำหรับสร้างและใส่ CSS ตามเงื่อนไขของหน้าจอ และ PWA
+function applyResponsiveCss() {
+    // ตรวจสอบว่าหน้าจอขนาดเล็กกว่าความกว้าง 1024px (mobile/tablet)
+    const isMobileSize = window.innerWidth < 1024;
+
+    // ตรวจสอบว่าเปิดใช้งานในโหมด PWA หรือไม่
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+
+    // ตัวแปรเก็บ CSS ที่จะ inject
+    let css = "";
+
+    // ถ้าเปิดในโหมด PWA
+    if (isPWA) {
+        css = `
+            * {
+                -webkit-user-select: none !important;
+                -ms-user-select: none !important;
+                user-select: none !important;
+                -webkit-user-drag: none !important;
+                -moz-user-drag: none !important;
+            }
+            img {
+                -webkit-user-select: none !important;
+                -ms-user-select: none !important;
+                user-select: none !important;
+                -webkit-user-drag: none !important;
+                -moz-user-drag: none !important;
+                pointer-events: none !important;
+            }
+        `;
+    }
+    // ถ้าเปิดในหน้าจอเล็ก (มือถือ/แท็บเล็ต)
+    else if (isMobileSize) {
+        css = `
+            * {
+                -webkit-user-select: none !important;
+                -ms-user-select: none !important;
+                user-select: none !important;
+                -webkit-user-drag: none !important;
+                -moz-user-drag: none !important;
+            }
+            img {
+                -webkit-user-select: none !important;
+                -ms-user-select: none !important;
+                user-select: none !important;
+                -webkit-user-drag: none !important;
+                -moz-user-drag: none !important;
+                pointer-events: none !important;
+            }
+        `;
+    }
+    // ถ้าเปิดใน desktop (หน้าจอใหญ่)
+    else {
+        css = `
+            img {
+                -webkit-user-select: none !important;
+                -ms-user-select: none !important;
+                user-select: none !important;
+                -webkit-user-drag: none !important;
+                -moz-user-drag: none !important;
+                pointer-events: none !important;
+            }
+        `;
+    }
+
+    // ลบ <style> เดิมออก ถ้ามีอยู่แล้ว เพื่อป้องกันซ้อนซ้ำ
+    if (dynamicStyleTag) dynamicStyleTag.remove();
+
+    // สร้างแท็ก <style> ใหม่
+    dynamicStyleTag = document.createElement("style");
+    dynamicStyleTag.type = "text/css";
+    dynamicStyleTag.appendChild(document.createTextNode(css));
+    document.head.appendChild(dynamicStyleTag);
+}
+
+// เมื่อ DOM โหลดเสร็จ
+document.addEventListener("DOMContentLoaded", () => {
+    // เรียกใช้ครั้งแรกตอนเปิดหน้า
+    applyResponsiveCss();
+
+    // ฟัง event resize จอ → เรียกใหม่ทุกครั้งที่ปรับขนาด
+    window.addEventListener("resize", applyResponsiveCss);
 });
+
 
 // ==============================
 // ฟังก์ชันป้องกันการคลิกขวา หรือคลิกเมาส์บนรูปภาพ
@@ -149,6 +216,25 @@ document.addEventListener('input', function (e) {
             if (regex.test(e.target.value)) {
                 e.target.value = e.target.value.replace(regex, '');
             }
+        }
+    }
+});
+
+// ป้องกัน Ctrl+C และ Ctrl+V ใน input และ textarea
+document.addEventListener('keydown', function (e) {
+    const tagName = e.target.tagName.toLowerCase();
+    const inputType = e.target.getAttribute("type") || "text";
+
+    // ตรวจเฉพาะช่องกรอกข้อมูล
+    if ((tagName === 'input' || tagName === 'textarea') && !e.target.disabled && !e.target.readOnly) {
+        // ห้าม Ctrl+C (Copy)
+        if (e.ctrlKey && e.key.toLowerCase() === 'c') {
+            e.preventDefault();
+        }
+
+        // ห้าม Ctrl+V (Paste)
+        if (e.ctrlKey && e.key.toLowerCase() === 'v') {
+            e.preventDefault();
         }
     }
 });
