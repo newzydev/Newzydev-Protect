@@ -203,24 +203,12 @@ document.addEventListener('keydown', function (e) {
 });
 
 // ==============================
-// ป้องกันการสลับแท็บ / โปรแกรมอื่น (Overlay ดำ 1 วิ → เบลออีก 1 วิ)
+// ป้องกันการสลับแท็บ / โปรแกรมอื่น (Overlay ดำทั้งหน้า)
 (function () {
     const overlayId = "blackout-overlay";
     const blackoutMessage = "กรุณาอย่าออกจากหน้านี้ เพื่อความปลอดภัยของข้อมูลค่ะ";
     let hiddenTime = null;
 
-    // Inject CSS สำหรับเบลอทั้งหน้าเว็บผ่าน body class
-    const style = document.createElement("style");
-    style.textContent = `
-        body.secure-blur {
-            filter: blur(20px);
-            pointer-events: none;
-            transition: filter 0.3s ease;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // ฟังก์ชันสร้าง overlay สีดำ
     function createBlackoutOverlay() {
         const overlay = document.createElement("div");
         overlay.id = overlayId;
@@ -245,30 +233,23 @@ document.addEventListener('keydown', function (e) {
         const existing = document.getElementById(overlayId);
 
         if (document.visibilityState === "hidden") {
-            hiddenTime = Date.now();
+            hiddenTime = Date.now(); // จำเวลาที่หายไป
         }
 
         if (document.visibilityState === "visible") {
             const timeAway = Date.now() - (hiddenTime || 0);
 
-            // 1️. แสดง overlay ดำก่อน
+            // แสดง overlay ทุกครั้งไม่ว่าเวลาจะสั้นหรือยาว
             if (!existing) {
                 const overlay = createBlackoutOverlay();
                 document.body.appendChild(overlay);
             }
 
-            // 2️. 1 วินาทีถัดมา → ลบ overlay แล้วเริ่มเบลอ
+            // ตั้งเวลาลบ overlay ทิ้ง (ให้ขึ้นสัก 1 วิพอหลอกตา)
             setTimeout(() => {
                 const overlay = document.getElementById(overlayId);
                 if (overlay) overlay.remove();
-
-                document.body.classList.add("secure-blur");
-            }, 1000);
-
-            // 3️. อีก 1 วิถัดมา (รวม 2 วิ) → ลบ blur ออก
-            setTimeout(() => {
-                document.body.classList.remove("secure-blur");
-            }, 2000);
+            }, 1000); // มืด 1 วิแล้วหาย
         }
     });
 })();
