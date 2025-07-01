@@ -23,9 +23,6 @@ Developed with love by **Sakdar Sukkwan** 💻
 - 📋 ป้องกัน Clipboard Action ในช่องกรอกข้อมูล:
   - `Ctrl + C` – ห้ามคัดลอกข้อมูลจาก `<input>` และ `<textarea>`
   - `Ctrl + V` – ห้ามวางข้อมูลใน `<input>` และ `<textarea>`
-- 🖤 ป้องกันการแคปหน้าจอเบื้องต้น:
-  - เมื่อผู้ใช้เปลี่ยนแท็บ / ไปหน้าอื่น จะมี Overlay สีดำแสดงบนหน้าจอ
-  - ปิด Overlay ทันทีเมื่อผู้ใช้กลับมาหน้าเว็บ
 - 🔒 ป้องกันการแอบใช้ console ด้วยการแสดงคำเตือนใน Developer Console
 - 🌐 รองรับทั้งเบราว์เซอร์ IE, Netscape (โบราณ) และเบราว์เซอร์สมัยใหม่ อย่าง Google Chrome, Firefox
 - 📦 สามารถแทรกใน HTML หรือ Blazor Razor page ได้ทันที
