@@ -101,7 +101,6 @@ var message = "ระบบไม่อนุญาตให้คลิกข�
 // ฟังก์ชันป้องกันคลิกขวา
 function disableRightClick(e) {
     if (e.button == 2 || e.which == 3) {
-        // alert(message);
         console.warn(message);
         return false;
     }
@@ -124,7 +123,6 @@ document.onkeydown = function () {
     // ห้าม Ctrl + U (View Source)
     var message1 = "ระบบไม่อนุญาตให้กดปุ่ม Ctrl + U ค่ะ :)";
     if (event.ctrlKey && window.event.keyCode == 85) {
-        // alert(message1);
         console.warn(message1);
         return false;
     }
@@ -134,14 +132,12 @@ document.onkeydown = function () {
     if (window.event && window.event.keyCode == 123) {
         event.keyCode = 0;
         event.returnValue = false;
-        // alert(message2);
         console.warn(message2);
     }
 
     // ห้าม Ctrl + S (Save Page)
     var message3 = "ระบบไม่อนุญาตให้กดปุ่ม Ctrl + S ค่ะ :)";
     if (event.ctrlKey && window.event.keyCode == 83) {
-        // alert(message3);
         console.warn(message3);
         return false;
     }
@@ -151,7 +147,6 @@ document.onkeydown = function () {
     if (window.event && window.event.keyCode == 116) {
         event.keyCode = 0;
         event.returnValue = false;
-        // alert(message4);
         console.warn(message4);
     }
 };
@@ -168,7 +163,6 @@ document.addEventListener('input', function (e) {
         if (["text", "search", "email", "tel", "url"].includes(inputType)) {
             const regex = /['"\\;]/g;
             if (regex.test(e.target.value)) {
-                // alert(message5);
                 console.warn(message5);
                 e.target.value = e.target.value.replace(regex, '');
             }
@@ -188,14 +182,12 @@ document.addEventListener('keydown', function (e) {
     if ((tagName === 'input' || tagName === 'textarea') && !e.target.disabled && !e.target.readOnly) {
         // ห้าม Ctrl+C (Copy)
         if (e.ctrlKey && e.key.toLowerCase() === 'c') {
-            // alert(message6);
             console.warn(message6);
             e.preventDefault();
         }
 
         // ห้าม Ctrl+V (Paste)
         if (e.ctrlKey && e.key.toLowerCase() === 'v') {
-            // alert(message7);
             console.warn(message7);
             e.preventDefault();
         }
