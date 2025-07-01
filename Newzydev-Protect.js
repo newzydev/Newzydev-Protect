@@ -58,9 +58,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ==============================
-// แสดงข้อความเตือนเมื่อพยายามเซฟรูป
-var clickmessage = "ระบบไม่อนุญาตให้บันทึกภาพค่ะ :)";
-
 // ฟังก์ชันป้องกันการคลิกขวา หรือคลิกเมาส์บนรูปภาพ
 function disableclick(e) {
     if (document.all) {
@@ -95,13 +92,9 @@ else if (document.getElementById) document.onmouseup = disableclick;
 else if (document.layers) associateimages();
 
 // ==============================
-// แสดงข้อความเมื่อห้ามคลิกขวาทั่วไป
-var message = "ระบบไม่อนุญาตให้คลิกขวาค่ะ :)";
-
 // ฟังก์ชันป้องกันคลิกขวา
 function disableRightClick(e) {
     if (e.button == 2 || e.which == 3) {
-        console.warn(message);
         return false;
     }
 }
@@ -121,40 +114,31 @@ document.addEventListener('mousedown', function (e) {
 document.onkeydown = function () {
 
     // ห้าม Ctrl + U (View Source)
-    var message1 = "ระบบไม่อนุญาตให้กดปุ่ม Ctrl + U ค่ะ :)";
     if (event.ctrlKey && window.event.keyCode == 85) {
-        console.warn(message1);
         return false;
     }
 
     // ห้าม F12 (เปิด Developer Tools)
-    var message2 = "ระบบไม่อนุญาตให้กดปุ่ม F12 ค่ะ :)";
     if (window.event && window.event.keyCode == 123) {
         event.keyCode = 0;
         event.returnValue = false;
-        console.warn(message2);
     }
 
     // ห้าม Ctrl + S (Save Page)
-    var message3 = "ระบบไม่อนุญาตให้กดปุ่ม Ctrl + S ค่ะ :)";
     if (event.ctrlKey && window.event.keyCode == 83) {
-        console.warn(message3);
         return false;
     }
 
     // ห้าม F5 (Refresh)
-    var message4 = "ระบบไม่อนุญาตให้กดปุ่ม F5 ค่ะ :)";
     if (window.event && window.event.keyCode == 116) {
         event.keyCode = 0;
         event.returnValue = false;
-        console.warn(message4);
     }
 };
 
 // ==============================
 // ฟังก์ชันตรวจสอบ input เพื่อป้องกัน SQL Injection
 document.addEventListener('input', function (e) {
-    var message5 = "ระบบปฏิเสธเครื่องหมายพิเศษที่อาจจะใช้ในการทำ SQL Injection ค่ะ :)";
     const tagName = e.target.tagName.toLowerCase();
 
     // ตรวจเฉพาะ input type="text", "search", หรือ textarea
@@ -163,7 +147,6 @@ document.addEventListener('input', function (e) {
         if (["text", "search", "email", "tel", "url"].includes(inputType)) {
             const regex = /['"\\;]/g;
             if (regex.test(e.target.value)) {
-                console.warn(message5);
                 e.target.value = e.target.value.replace(regex, '');
             }
         }
