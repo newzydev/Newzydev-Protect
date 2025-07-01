@@ -203,36 +203,75 @@ document.addEventListener('keydown', function (e) {
 });
 
 // ==============================
-// ป้องกันการสลับแท็บ / โปรแกรมอื่น (Overlay ดำทั้งจอ)
-document.addEventListener("visibilitychange", function () {
-    const existingOverlay = document.getElementById("blackout-overlay");
+// ป้องกันการสลับแท็บ / โปรแกรมอื่น (Overlay ดำ 1 วิ → เบลออีก 1 วิ)
+(function () {
+    const overlayId = "blackout-overlay";
+    const blackoutMessage = "กรุณาอย่าออกจากหน้านี้ เพื่อความปลอดภัยของข้อมูลค่ะ";
+    let hiddenTime = null;
 
-    if (document.hidden) {
-        if (!existingOverlay) {
-            const overlay = document.createElement("div");
-            overlay.id = "blackout-overlay";
-            overlay.style.position = "fixed";
-            overlay.style.top = "0";
-            overlay.style.left = "0";
-            overlay.style.width = "100vw";
-            overlay.style.height = "100vh";
-            overlay.style.backgroundColor = "black";
-            overlay.style.color = "white";
-            overlay.style.display = "flex";
-            overlay.style.alignItems = "center";
-            overlay.style.justifyContent = "center";
-            overlay.style.fontSize = "1.5rem";
-            overlay.style.zIndex = "999999";
-            overlay.style.pointerEvents = "none";
-            overlay.innerText = "กรุณาอย่าออกจากหน้านี้ เพื่อความปลอดภัยของข้อมูลค่ะ";
-            document.body.appendChild(overlay);
+    // Inject CSS สำหรับเบลอทั้งหน้าเว็บผ่าน body class
+    const style = document.createElement("style");
+    style.textContent = `
+        body.secure-blur {
+            filter: blur(20px);
+            pointer-events: none;
+            transition: filter 0.3s ease;
         }
-    } else {
-        if (existingOverlay) {
-            existingOverlay.remove();
-        }
+    `;
+    document.head.appendChild(style);
+
+    // ฟังก์ชันสร้าง overlay สีดำ
+    function createBlackoutOverlay() {
+        const overlay = document.createElement("div");
+        overlay.id = overlayId;
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100vw";
+        overlay.style.height = "100vh";
+        overlay.style.backgroundColor = "black";
+        overlay.style.color = "white";
+        overlay.style.display = "flex";
+        overlay.style.alignItems = "center";
+        overlay.style.justifyContent = "center";
+        overlay.style.fontSize = "1.8rem";
+        overlay.style.zIndex = "999999999";
+        overlay.style.pointerEvents = "none";
+        overlay.innerText = blackoutMessage;
+        return overlay;
     }
-});
+
+    document.addEventListener("visibilitychange", function () {
+        const existing = document.getElementById(overlayId);
+
+        if (document.visibilityState === "hidden") {
+            hiddenTime = Date.now();
+        }
+
+        if (document.visibilityState === "visible") {
+            const timeAway = Date.now() - (hiddenTime || 0);
+
+            // 1️. แสดง overlay ดำก่อน
+            if (!existing) {
+                const overlay = createBlackoutOverlay();
+                document.body.appendChild(overlay);
+            }
+
+            // 2️. 1 วินาทีถัดมา → ลบ overlay แล้วเริ่มเบลอ
+            setTimeout(() => {
+                const overlay = document.getElementById(overlayId);
+                if (overlay) overlay.remove();
+
+                document.body.classList.add("secure-blur");
+            }, 1000);
+
+            // 3️. อีก 1 วิถัดมา (รวม 2 วิ) → ลบ blur ออก
+            setTimeout(() => {
+                document.body.classList.remove("secure-blur");
+            }, 2000);
+        }
+    });
+})();
 
 // ==============================
 // แสดงข้อความใน Developer Console เพื่อเตือนคนแอบส่อง
