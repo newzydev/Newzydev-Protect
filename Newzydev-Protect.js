@@ -203,58 +203,6 @@ document.addEventListener('keydown', function (e) {
 });
 
 // ==============================
-// ป้องกันการสลับแท็บ / โปรแกรมอื่น (Overlay ดำทั้งหน้า)
-(function () {
-    const overlayId = "blackout-overlay";
-    const blackoutMessage = "กรุณาอย่าออกจากหน้านี้ เพื่อความปลอดภัยของข้อมูลค่ะ";
-    let hiddenTime = null;
-
-    function createBlackoutOverlay() {
-        const overlay = document.createElement("div");
-        overlay.id = overlayId;
-        overlay.style.position = "fixed";
-        overlay.style.top = "0";
-        overlay.style.left = "0";
-        overlay.style.width = "100vw";
-        overlay.style.height = "100vh";
-        overlay.style.backgroundColor = "black";
-        overlay.style.color = "white";
-        overlay.style.display = "flex";
-        overlay.style.alignItems = "center";
-        overlay.style.justifyContent = "center";
-        overlay.style.fontSize = "1.8rem";
-        overlay.style.zIndex = "999999999";
-        overlay.style.pointerEvents = "none";
-        overlay.innerText = blackoutMessage;
-        return overlay;
-    }
-
-    document.addEventListener("visibilitychange", function () {
-        const existing = document.getElementById(overlayId);
-
-        if (document.visibilityState === "hidden") {
-            hiddenTime = Date.now(); // จำเวลาที่หายไป
-        }
-
-        if (document.visibilityState === "visible") {
-            const timeAway = Date.now() - (hiddenTime || 0);
-
-            // แสดง overlay ทุกครั้งไม่ว่าเวลาจะสั้นหรือยาว
-            if (!existing) {
-                const overlay = createBlackoutOverlay();
-                document.body.appendChild(overlay);
-            }
-
-            // ตั้งเวลาลบ overlay ทิ้ง (ให้ขึ้นสัก 1 วิพอหลอกตา)
-            setTimeout(() => {
-                const overlay = document.getElementById(overlayId);
-                if (overlay) overlay.remove();
-            }, 1000); // มืด 1 วิแล้วหาย
-        }
-    });
-})();
-
-// ==============================
 // แสดงข้อความใน Developer Console เพื่อเตือนคนแอบส่อง
 console.log('%cหยุด!!!', 'color: red; font-size: 40px; font-weight: bold;');
 console.log('%cประกาศจากผู้พัฒนาระบบ', 'color: white; font-size: 16px;');
