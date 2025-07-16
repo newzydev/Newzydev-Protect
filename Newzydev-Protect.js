@@ -12,34 +12,70 @@
 // ผู้พัฒนา : ศักดา สุขขวัญ
 // แหล่งที่มา : https://github.com/newzydev/Newzydev-Protect
 // ใบอนุญาต : ได้รับอนุญาตภายใต้สัญญาอนุญาต Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)
-// การแก้ไขซอร์สโค้ดได้รับอนุญาตโดย ศักดา สุขขวัญ
 
 // ==============================
-// ป้องกันการเลือกข้อความ (Text Selection)
-//document.addEventListener('selectstart', function (e) {
-//    e.preventDefault();
-//}, false);
-
-// ป้องกันการลากเพื่อเลือกข้อความ (Mouse Drag)
-document.addEventListener('mousedown', function (e) {
-    if (e.detail > 1) {
-        e.preventDefault();
-    }
-}, false);
-
-// ป้องกันการใช้คีย์บอร์ดในการเลือก (Shift + ลูกศร)
-document.addEventListener('keydown', function (e) {
-    if (e.shiftKey && (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown")) {
-        e.preventDefault();
-    }
-}, false);
+// ตรวจสอบสถานะการแสดงผล
+// ==============================
+const isMobileSize = window.innerWidth < 1024;
+const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+const isWebsite = !isPWA && !isMobileSize;
 
 // ==============================
 // ป้องกันเนื้อหาบนเว็บแบบปรับตามอุปกรณ์และโหมดการใช้งาน
 // เก็บแท็ก <style> ที่ถูกเพิ่มเข้าไปใน document ไว้เพื่อจะได้ลบตอนเปลี่ยนขนาดหน้าจอ
-let dynamicStyleTag;
+let dynamicStyleTag = null;
+// ==============================
 
+// ==============================
+// ฟังก์ชันรวมเพื่อเรียกใช้การป้องกันตาม platform
+// ==============================
+function applyProtectionByMode() {
+    if (isPWA) {
+        // โหมด PWA
+        enableAllProtections();
+    }
+    else if (isMobileSize) {
+        // โหมดมือถือ/แท็บเล็ต
+        enableAllProtections();
+    }
+    else if (isWebsite) {
+        // โหมดเว็บไซต์ปกติ Desktop
+        applyResponsiveCss();
+        showConsoleWarning();
+        enableImageClickBlock();
+        enableKeyboardShortcutBlock();
+        enableBasicSQLInjectionBlock();
+    }
+}
+
+// ==============================
+// เรียกใช้เมื่อ DOM โหลดแล้ว
+// ==============================
+window.onload = () => {
+    applyProtectionByMode();
+
+    window.addEventListener("resize", () => {
+        applyProtectionByMode();
+    });
+};
+
+// ==============================
+// ฟังก์ชันสำหรับเรียกใช้ทุกตัวป้องกัน
+// ==============================
+function enableAllProtections() {
+    applyResponsiveCss();
+    enableTextSelectionProtection();
+    enableRightClickBlock();
+    enableImageClickBlock();
+    enableKeyboardShortcutBlock();
+    enableBasicSQLInjectionBlock();
+    enableCopyPasteBlock();
+    showConsoleWarning();
+}
+
+// ==============================
 // ฟังก์ชันสำหรับสร้างและใส่ CSS ตามเงื่อนไขของหน้าจอ และ PWA
+// ==============================
 function applyResponsiveCss() {
     // ตรวจสอบว่าหน้าจอขนาดเล็กกว่าความกว้าง 1024px (mobile/tablet)
     const isMobileSize = window.innerWidth < 1024;
@@ -114,137 +150,110 @@ function applyResponsiveCss() {
     document.head.appendChild(dynamicStyleTag);
 }
 
-// เมื่อ DOM โหลดเสร็จ
-document.addEventListener("DOMContentLoaded", () => {
-    // เรียกใช้ครั้งแรกตอนเปิดหน้า
-    applyResponsiveCss();
-
-    // ฟัง event resize จอ → เรียกใหม่ทุกครั้งที่ปรับขนาด
-    window.addEventListener("resize", applyResponsiveCss);
-});
-
-
 // ==============================
-// ฟังก์ชันป้องกันการคลิกขวา หรือคลิกเมาส์บนรูปภาพ
-function disableclick(e) {
-    if (document.all) {
-        // สำหรับ IE
-        if (event.button == 2 || event.button == 3) {
-            if (event.srcElement.tagName == "IMG") {
-                return false;
-            }
+// ป้องกันการเลือกข้อความ
+// ==============================
+function enableTextSelectionProtection() {
+    document.addEventListener('selectstart', e => e.preventDefault(), false);
+    document.addEventListener('mousedown', e => { if (e.detail > 1) e.preventDefault(); }, false);
+    document.addEventListener('keydown', e => {
+        if (e.shiftKey && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+            e.preventDefault();
         }
-    } else if (document.layers) {
-        // สำหรับ Netscape
-        if (e.which == 3) {
-            return false;
-        }
-    } else if (document.getElementById) {
-        // สำหรับเบราว์เซอร์อื่น ๆ
-        if (e.which == 3 && e.target.tagName == "IMG") {
-            return false;
-        }
-    }
+    }, false);
 }
 
-// ฟังก์ชันผูก event disableclick กับรูปภาพทั้งหมด
-function associateimages() {
-    for (i = 0; i < document.images.length; i++)
-        document.images[i].onmousedown = disableclick;
+// ==============================
+// ป้องกันคลิกขวา
+// ==============================
+function enableRightClickBlock() {
+    function disableRightClick(e) {
+        if (e.button === 2 || e.which === 3) return false;
+    }
+
+    document.addEventListener('contextmenu', e => e.preventDefault(), false);
+    document.addEventListener('mousedown', disableRightClick, false);
 }
 
-// ผูก event กับการคลิกเมาส์ทั้งหน้าเว็บ
-if (document.all) document.onmousedown = disableclick;
-else if (document.getElementById) document.onmouseup = disableclick;
-else if (document.layers) associateimages();
-
 // ==============================
-// ฟังก์ชันป้องกันคลิกขวา
-function disableRightClick(e) {
-    if (e.button == 2 || e.which == 3) {
-        return false;
+// ป้องกันคลิกขวาบนรูป
+// ==============================
+function enableImageClickBlock() {
+    function disableclick(e) {
+        if (document.all && (event.button === 2 || event.button === 3) && event.srcElement.tagName === "IMG") return false;
+        else if (document.layers && e.which === 3) return false;
+        else if (document.getElementById && e.which === 3 && e.target.tagName === "IMG") return false;
     }
+
+    function associateimages() {
+        for (let i = 0; i < document.images.length; i++) {
+            document.images[i].onmousedown = disableclick;
+        }
+    }
+
+    if (document.all) document.onmousedown = disableclick;
+    else if (document.getElementById) document.onmouseup = disableclick;
+    else if (document.layers) associateimages();
 }
 
-// ปิดการแสดงเมนูคลิกขวา
-document.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
-}, false);
+// ==============================
+// ป้องกันปุ่มลัดคีย์บอร์ด (F12, Ctrl+U ฯลฯ)
+// ==============================
+function enableKeyboardShortcutBlock() {
+    document.onkeydown = function (e) {
+        if (!e) e = window.event;
+        const key = e.keyCode;
 
-// ป้องกันเบราว์เซอร์ที่ไม่รองรับ contextmenu
-document.addEventListener('mousedown', function (e) {
-    disableRightClick(e);
-}, false);
+        if (e.ctrlKey && key === 85) return false; // Ctrl + U
+        if (key === 123) { e.keyCode = 0; e.returnValue = false; return false; } // F12
+        if (e.ctrlKey && key === 83) return false; // Ctrl + S
+        if (key === 116) { e.keyCode = 0; e.returnValue = false; return false; } // F5
+    };
+}
 
 // ==============================
-// ฟังก์ชันตรวจจับปุ่มลัดคีย์บอร์ดที่มักใช้แอบดู source
-document.onkeydown = function () {
-
-    // ห้าม Ctrl + U (View Source)
-    if (event.ctrlKey && window.event.keyCode == 85) {
-        return false;
-    }
-
-    // ห้าม F12 (เปิด Developer Tools)
-    if (window.event && window.event.keyCode == 123) {
-        event.keyCode = 0;
-        event.returnValue = false;
-    }
-
-    // ห้าม Ctrl + S (Save Page)
-    if (event.ctrlKey && window.event.keyCode == 83) {
-        return false;
-    }
-
-    // ห้าม F5 (Refresh)
-    if (window.event && window.event.keyCode == 116) {
-        event.keyCode = 0;
-        event.returnValue = false;
-    }
-};
-
+// ป้องกัน SQL Injection เบื้องต้น
 // ==============================
-// ฟังก์ชันตรวจสอบ input เพื่อป้องกัน SQL Injection
-document.addEventListener('input', function (e) {
-    const tagName = e.target.tagName.toLowerCase();
-
-    // ตรวจเฉพาะ input type="text", "search", หรือ textarea
-    if ((tagName === 'input' || tagName === 'textarea') && !e.target.disabled && !e.target.readOnly) {
+function enableBasicSQLInjectionBlock() {
+    document.addEventListener('input', e => {
+        const tagName = e.target.tagName.toLowerCase();
         const inputType = e.target.getAttribute("type") || "text";
-        if (["text", "search", "email", "tel", "url"].includes(inputType)) {
-            const regex = /['"\\;]/g;
-            if (regex.test(e.target.value)) {
-                e.target.value = e.target.value.replace(regex, '');
+        if ((tagName === 'input' || tagName === 'textarea') && !e.target.disabled && !e.target.readOnly) {
+            if (["text", "search", "email", "tel", "url"].includes(inputType)) {
+                const regex = /['"\\;]/g;
+                if (regex.test(e.target.value)) {
+                    e.target.value = e.target.value.replace(regex, '');
+                }
             }
         }
-    }
-});
-
-// ป้องกัน Ctrl+C และ Ctrl+V ใน input และ textarea
-document.addEventListener('keydown', function (e) {
-    const tagName = e.target.tagName.toLowerCase();
-    const inputType = e.target.getAttribute("type") || "text";
-
-    // ตรวจเฉพาะช่องกรอกข้อมูล
-    if ((tagName === 'input' || tagName === 'textarea') && !e.target.disabled && !e.target.readOnly) {
-        // ห้าม Ctrl+C (Copy)
-        if (e.ctrlKey && e.key.toLowerCase() === 'c') {
-            e.preventDefault();
-        }
-
-        // ห้าม Ctrl+V (Paste)
-        if (e.ctrlKey && e.key.toLowerCase() === 'v') {
-            e.preventDefault();
-        }
-    }
-});
+    });
+}
 
 // ==============================
-// แสดงข้อความใน Developer Console เพื่อเตือนคนแอบส่อง
-console.log('%cหยุด!!!', 'color: red; font-size: 40px; font-weight: bold;');
-console.log('%cประกาศจากผู้พัฒนาระบบ', 'color: white; font-size: 16px;');
-console.log('%cฟีเจอร์นี้เป็นฟีเจอร์ของเบราว์เซอร์ที่มีจุดมุ่งหมายให้ใช้สำหรับผู้พัฒนา หากมีคนบอกให้คุณคัดลอกแล้ววางข้อความบางอย่างที่นี่เพื่อเปิดใช้งานฟีเจอร์ของระบบ หรือเพื่อเข้าถึงบัญชีของบุคคลใดบุคคลหนึ่ง โดยเจตนา คำบอกกล่าวเช่นนี้เป็นการหลอกลวงและอาจจะมอบสิทธิการเข้าถึงบัญชี ของคุณให้กับบุคคลดังกล่าว', 'color: white; font-size: 16px;');
-console.log('%cโปรดอ่านนโยบายความเป็นส่วนตัว นโยบายคุกกี้ ข้อกำหนด และเงื่อนไขการใช้งาน Newzydev-Protect ได้ที่ %chttps://github.com/newzydev/Newzydev-Protect%c สำหรับข้อมูลเพิ่มเติม',
-    'color: white; font-size: 16px;',
-    'color: #00f; text-decoration: underline; font-size: 16px;',
-    'color: white; font-size: 16px;');
+// ป้องกัน Ctrl+C และ Ctrl+V
+// ==============================
+function enableCopyPasteBlock() {
+    document.addEventListener('keydown', e => {
+        const tagName = e.target.tagName.toLowerCase();
+        const inputType = e.target.getAttribute("type") || "text";
+
+        if ((tagName === 'input' || tagName === 'textarea') && !e.target.disabled && !e.target.readOnly) {
+            if (e.ctrlKey && ['c', 'v'].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+            }
+        }
+    });
+}
+
+// ==============================
+// แสดงคำเตือน Developer Console
+// ==============================
+function showConsoleWarning() {
+    console.log('%cหยุด!!!', 'color: red; font-size: 40px; font-weight: bold;');
+    console.log('%cประกาศจากผู้พัฒนาระบบ', 'color: blue; font-size: 16px;');
+    console.log('%cฟีเจอร์นี้เป็นฟีเจอร์ของเบราว์เซอร์ที่มีจุดมุ่งหมายให้ใช้สำหรับผู้พัฒนา หากมีคนบอกให้คุณคัดลอกแล้ววางข้อความบางอย่างที่นี่เพื่อเปิดใช้งานฟีเจอร์ของระบบ หรือเพื่อเข้าถึงบัญชีของบุคคลใดบุคคลหนึ่ง โดยเจตนา คำบอกกล่าวเช่นนี้เป็นการหลอกลวงและอาจจะมอบสิทธิการเข้าถึงบัญชี ของคุณให้กับบุคคลดังกล่าว', 'color: blue; font-size: 16px;');
+    console.log('%cโปรดอ่านนโยบายความเป็นส่วนตัว นโยบายคุกกี้ ข้อกำหนด และเงื่อนไขการใช้งาน Newzydev-Protect ได้ที่ %chttps://github.com/newzydev/Newzydev-Protect%c สำหรับข้อมูลเพิ่มเติม',
+        'color: blue; font-size: 16px;',
+        'color: blue; text-decoration: underline; font-size: 16px;',
+        'color: blue; font-size: 16px;');
+}
