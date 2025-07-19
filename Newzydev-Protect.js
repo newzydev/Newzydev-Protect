@@ -4,7 +4,6 @@
 // Developer : Sakdar Sukkwan
 // Source Code : https://github.com/newzydev/Newzydev-Protect
 // License : Licensed under Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0).
-// Permission to modify the source code is granted by Sakdar Sukkwan
 
 // ==============================
 // Thai Version
@@ -41,10 +40,9 @@ function applyProtectionByMode() {
     else if (isWebsite) {
         // โหมดเว็บไซต์ปกติ Desktop
         applyResponsiveCss();
-        showConsoleWarning();
         enableImageClickBlock();
-        enableKeyboardShortcutBlock();
-        enableBasicSQLInjectionBlock();
+        enableSQLInjectionBlock();
+        showConsoleWarning();
     }
 }
 
@@ -68,7 +66,7 @@ function enableAllProtections() {
     enableRightClickBlock();
     enableImageClickBlock();
     enableKeyboardShortcutBlock();
-    enableBasicSQLInjectionBlock();
+    enableSQLInjectionBlock();
     enableCopyPasteBlock();
     showConsoleWarning();
 }
@@ -197,33 +195,66 @@ function enableImageClickBlock() {
 }
 
 // ==============================
-// ป้องกันปุ่มลัดคีย์บอร์ด (F12, Ctrl+U ฯลฯ)
+// ป้องกันปุ่มลัดคีย์บอร์ดยอดนิยมทั้งหมด
 // ==============================
 function enableKeyboardShortcutBlock() {
-    document.onkeydown = function (e) {
+    document.addEventListener('keydown', function (e) {
         if (!e) e = window.event;
-        const key = e.keyCode;
+        const key = e.key.toLowerCase();
+        const code = e.keyCode || e.which;
 
-        if (e.ctrlKey && key === 85) return false; // Ctrl + U
-        if (key === 123) { e.keyCode = 0; e.returnValue = false; return false; } // F12
-        if (e.ctrlKey && key === 83) return false; // Ctrl + S
-        if (key === 116) { e.keyCode = 0; e.returnValue = false; return false; } // F5
-    };
+        if (
+            (e.ctrlKey && key === 'u') || // Ctrl + U
+            (e.ctrlKey && key === 's') || // Ctrl + S
+            (e.ctrlKey && key === 'x') || // Ctrl + X
+            (e.ctrlKey && e.shiftKey && key === 'i') || // Ctrl + Shift + I
+            (e.ctrlKey && e.shiftKey && key === 'j') || // Ctrl + Shift + J
+            (e.ctrlKey && e.shiftKey && key === 'c') || // Ctrl + Shift + C
+            (e.ctrlKey && e.shiftKey && key === 'k') || // Ctrl + Shift + K (Firefox DevTools)
+            (e.metaKey && key === 's') || // ⌘ + S (Mac)
+            (code === 123) || // F12
+            (code === 116) // F5
+        ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }, false);
 }
 
 // ==============================
 // ป้องกัน SQL Injection เบื้องต้น
 // ==============================
-function enableBasicSQLInjectionBlock() {
+function enableSQLInjectionBlock() {
     document.addEventListener('input', e => {
         const tagName = e.target.tagName.toLowerCase();
         const inputType = e.target.getAttribute("type") || "text";
+
+        // ใช้กับเฉพาะ input/textarea ที่ใช้งานได้
         if ((tagName === 'input' || tagName === 'textarea') && !e.target.disabled && !e.target.readOnly) {
             if (["text", "search", "email", "tel", "url"].includes(inputType)) {
-                const regex = /['"\\;]/g;
-                if (regex.test(e.target.value)) {
-                    e.target.value = e.target.value.replace(regex, '');
+
+                let value = e.target.value;
+
+                // ลบสัญลักษณ์ SQL Injection พื้นฐาน
+                const basicChars = /['"\\;`]/g;
+                value = value.replace(basicChars, '');
+
+                // ลบคำสั่ง SQL ที่มักใช้ใน Injection
+                const sqlKeywords = [
+                    /(\b(select|insert|delete|update|drop|alter|create|truncate|replace|grant|revoke|exec|union|where|from|having|or|and|like)\b)/gi,
+                    /(--|#|\/\*|\*\/)/g, // ความเห็นใน SQL
+                    /(\bor\b\s+\d+=\d+)/gi, // or 1=1
+                    /(\band\b\s+\d+=\d+)/gi, // and 1=1
+                    /(\bnull\b)/gi, // null keyword
+                    /(\btrue\b|\bfalse\b)/gi // boolean SQL keywords
+                ];
+
+                for (const regex of sqlKeywords) {
+                    value = value.replace(regex, '');
                 }
+
+                e.target.value = value;
             }
         }
     });
